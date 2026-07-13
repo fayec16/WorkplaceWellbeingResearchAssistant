@@ -1,0 +1,16 @@
+{
+  "name": "workplace-wellbeing-briefing",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Daily briefing of newly published peer-reviewed burnout & workplace wellbeing research, with AI-generated action items.",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "nodemailer": "^9.0.3"
+  }
+}

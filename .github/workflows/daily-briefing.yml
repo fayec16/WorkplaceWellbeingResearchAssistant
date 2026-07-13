@@ -1,0 +1,42 @@
+name: Daily Wellbeing Research Briefing
+
+on:
+  schedule:
+    # 07:00 UTC daily. Edit to taste (this is a two-day delay by default via
+    # DAYS_BACK in .env / repo variables, so 07:00 UTC is fine even with
+    # PubMed's indexing lag).
+    - cron: "0 7 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  briefing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - run: npm install
+
+      - name: Generate briefing
+        run: node src/index.js
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          SERPAPI_API_KEY: ${{ secrets.SERPAPI_API_KEY }}
+          DAYS_BACK: ${{ vars.DAYS_BACK }}
+
+      - name: Commit briefing to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add briefings/
+          git diff --staged --quiet || git commit -m "Add briefing for $(date +'%Y-%m-%d')"
+          git push
